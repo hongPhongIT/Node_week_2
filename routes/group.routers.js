@@ -12,7 +12,7 @@ router.get('/groups/:id', validate(group.params),GroupController.getGroup);
 // Create group
 router.post('/groups', validate(group.body),GroupController.addGroup);
 // Update group
-router.put('/groups/:id', validate(group),GroupController.updateGroup);
+router.put('/groups/:id', validate([group.params, group.bodyForUpdate]),GroupController.updateGroup);
 // Remove group
 router.delete('/groups/:id', validate(group.params),GroupController.deleteGroup);
 
