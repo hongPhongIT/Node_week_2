@@ -6,29 +6,10 @@ import JWT from 'jsonwebtoken';
 
 const UserController = {};
 
-const checkToken = async (token, next) => {
-    try {
-        if (!token) {
-            return next(new Error('Not found authentication'));
-        }
-        const data = await JWT.verify(token, SECRETKEY);
-        const _id = data._id;
-        const user = User.findOne({ _id: _id, deleteAt: null });
-        return user;
-    } catch (e) {
-        return next(e);
-    }
-
-}
 
 UserController.getAll = async (req, res, next) => {
     try {
-        const user = checkToken(req.headers.token, next);
-
-        if (!user) {
-            return next(new Error('User is not found'));
-        }
-        const users = await User.find({ deleteAt: null });
+        const users = await User.find({ deleteAt: null }).lean(true);
         return res.json({
             isSuccess: true,
             users,
@@ -39,14 +20,9 @@ UserController.getAll = async (req, res, next) => {
 };
 
 UserController.getUser = async (req, res, next) => {
-    const user = checkToken(req.headers.token, next);
-
-    if (!user) {
-        return next(new Error('User is not found'));
-    }
     const userId = req.params.id;
     try {
-        const user = await User.findOne({ _id: userId, deleteAt: null });
+        const user = await User.findOne({ _id: userId, deleteAt: null }).lean(true);
         if (!user) {
             return res.status(400).json({ isSuccess: false, message: 'User is not found' });
         } else {
@@ -64,13 +40,12 @@ UserController.addUser = async (req, res, next) => {
         const user = new User({
             ...req.body
         });
+        delete user._doc.deleteAt;
         const password = user.password;
-        await bcrypt.genSalt(saltRounds, function(err, salt) {
-            bcrypt.hash(password, salt, function(err, hash) {
-                user.password = hash;
-                user.save();
-            });
-        });
+        const salt = await bcrypt.genSaltSync(saltRounds);
+        const hash = await bcrypt.hashSync(password, salt);
+        user.password = hash;
+        await user.save();
         delete user._doc.password;
         return res.json({
             isSuccess: true,
@@ -82,15 +57,9 @@ UserController.addUser = async (req, res, next) => {
 };
 
 UserController.updateUser = async (req, res, next) => {
-    const user = checkToken(req.headers.token, next);
-
-    if (!user) {
-        return next(new Error('User is not found'));
-    }
-
     const userId = req.params.id;
     try {
-        const user = await User.findOne({ _id: userId, deleteAt: null });
+        const user = await User.findOne({ _id: userId, deleteAt: null }).lean(true);
         let { lastName, firstName } = req.body;
         if (!user) {
             return res.status(400).json({ isSuccess: false, message: 'User is not found' });
@@ -102,7 +71,7 @@ UserController.updateUser = async (req, res, next) => {
             if (firstName !== undefined) {
                 _user.firstName = firstName;
             }
-            user.update(_user);
+            User.update(_user);
             delete user.password;
             return res.status(200).json({ isSuccess: true, user: user });
         }
@@ -114,7 +83,7 @@ UserController.updateUser = async (req, res, next) => {
 UserController.login = async (req, res, next) => {
     try {
         const { password, email } = req.body;
-        const user = await User.findOne({email});
+        const user = await User.findOne({email}).lean(true);
         if (!user) {
             return next(new Error('User is not found'));
         }
@@ -122,8 +91,8 @@ UserController.login = async (req, res, next) => {
         if (!isCorrectPassword) {
             return next(new Error('Password is not correct'));
         }
-        delete user._doc.password;
-        const token = await JWT.sign(user._doc, SECRETKEY);
+        delete user.password;
+        const token = await JWT.sign(user, SECRETKEY);
         return res.json({
             isSuccess: true,
             user,
@@ -135,22 +104,15 @@ UserController.login = async (req, res, next) => {
 }
 
 UserController.deleteUser = async (req, res, next) => {
-
-    const user = checkToken(req.headers.token, next);
-
-    if (!user) {
-        return next(new Error('User is not found'));
-    }
-
     const userId = req.params.id;
     try {
-        const user = await User.findOne({ _id: userId, deleteAt: null });
+        const user = await User.findOne({ _id: userId, deleteAt: null }).lean(true);
         if (!user) {
             return res.status(400).json({ isSuccess: false, message: 'User is not found' });
         } else {
             const date = new Date();
             user.deleteAt = date;
-            await user.update(user);
+            await User.update(user);
             delete user.password;
             return res.status(200).json({ isSuccess: true, user: user });
         }
@@ -161,29 +123,22 @@ UserController.deleteUser = async (req, res, next) => {
 
 UserController.changePassword = async (req, res, next) => {
     try {
-        let user = await checkToken(req.headers.token, next);
-        if (!user) {
-            return next(new Error('User is not found'));
-        }
-        const { oldPassword, newPassword, reEnterNewPassword } = req.body;
-        const isCorrectPassword = await bcrypt.compare(oldPassword, user.password);
+        const { password } = req.user;
+        console.log( req.user)
+        const UserId = req.params.id;
+        const { oldPassword, newPassword } = req.body;
+        
+        const isCorrectPassword = await bcrypt.compare(oldPassword, password);
         if (!isCorrectPassword) {
             return next(new Error('Password is not correct'));
         }
 
-        if (newPassword !== reEnterNewPassword) {
-            return next(new Error('ReEnterPassword and New password is not match'));
-        }
-        await bcrypt.genSalt(saltRounds, function(err, salt) {
-            bcrypt.hash(newPassword, salt, async function(err, hash) {
-                user.password = hash;
-                await user.update(user);
-            });
-        });
-        delete user.password;
+        const salt = await bcrypt.genSaltSync(saltRounds);
+        const hash = await bcrypt.hashSync(newPassword, salt);
+        user.password = hash;
+        await User.update({_id: UserId}, {$set: { password: password }});
         return res.status(200).json({
             isSuccess: true,
-            user: user,
         });
     } catch (e) {
         return next(e);

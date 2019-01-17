@@ -3,14 +3,26 @@ import Group from '../models/group';
 const GroupController = {};
 
 GroupController.getAll = async (req, res, next) => {
+
+    const { page, limit } = req.query;
+    const skip = (parseInt(page) -1) * parseInt(limit);
     try {
-        const groups = await Group.find({ deleteAt: null });
-        //sua
-        if (!groups) {
-            return res.status(400).json({ isSuccess: false, message: 'Have no group' });
-        } else {
-            return res.status(200).json({ isSuccess: true, groups: groups });
-        }
+        const groups = await Group
+            .find({ deletedAt: null })
+            .populate([
+                {
+                    path: 'author',
+                    select: 'email fullName'
+                },
+                {
+                    path: 'members',
+                    select: 'fullName email'
+                }
+            ])
+            .sort({ createAt: -1 })
+            .skip(skip)
+            .limit(parseInt(limit));
+        return res.status(200).json({ isSuccess: true, groups: groups });
     } catch (e) {
         return next(e);
     }
@@ -19,12 +31,8 @@ GroupController.getAll = async (req, res, next) => {
 GroupController.getGroup = async (req, res, next) => {
     const groupId = req.params.id;
     try {
-        const group = await Group.find({ _id: groupId, deleteAt: null });
-        if (!group) {
-            return res.status(400).json({ isSuccess: false, message: 'Group is not found' });
-        } else {
-            return res.status(200).json({ isSuccess: true, group: group });
-        }
+        const group = await Group.find({ _id: groupId, deletedAt: null }).lean(true);
+        return res.status(200).json({ isSuccess: true, group: group });
     } catch (e) {
         return next(e);
     }
@@ -53,8 +61,8 @@ GroupController.addGroup = async (req, res, next) => {
 GroupController.updateGroup = async (req, res, next) => {
     const groupId = req.params.id;
     try {
-        const group = await Group.findOne({_id: groupId, deleteAt: null});
-        let {name, lastMessage, author, members} = req.body;
+        const group = await Group.findOne({_id: groupId, deletedAt: null});
+        let { name, lastMessage, author, members } = req.body;
         if (!group) {
             return res.status(400).json({isSuccess: false, message: 'User is not found'});
         } else {
@@ -88,12 +96,12 @@ GroupController.updateGroup = async (req, res, next) => {
 GroupController.deleteGroup = async (req, res, next) => {
     const groupId = req.params.id;
     try {
-        let group = await Group.findOne({_id: groupId, deleteAt: null });
+        let group = await Group.findOne({_id: groupId, deletedAt: null });
         if (!group) {
             return res.status(400).json({ isSuccess: false, message: 'Group is not found' });
         } else {
             const date = new Date();
-            group.deleteAt = date;
+            group.deletedAt = date;
             await group.update(group);
             return res.status(200).json({ isSuccess: true, group: group });
         }

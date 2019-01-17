@@ -4,6 +4,7 @@ import connectToDb from './db/connect';
 import user from './routes/user.routes';
 import chat from './routes/chat.routes';
 import group from './routes/group.routers';
+import message from './routes/message.routers';
 
 const server = express();
 
@@ -17,6 +18,7 @@ server.use(bodyParser.urlencoded({
 server.use(user);
 server.use(chat);
 server.use(group);
+server.use(message);
 
 server.use( (err, req, res, next) => {
     return res.status(500).json({

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import ChatController from '../controllers/chat.controller';
-import chat from '../validation/chat';
+import chat from '../validations/chat';
 const router = new Router();
 const validate = require('express-validation')
     , http = require('http');

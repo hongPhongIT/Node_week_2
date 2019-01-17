@@ -17,5 +17,9 @@ module.exports = {
         author: Joi.string().regex(/^(?=[a-f\\d]{24}$)(\\d+[a-f]|[a-f]+\\d)/i),
         lastMessage: Joi.string().regex(/^(?=[a-f\\d]{24}$)(\\d+[a-f]|[a-f]+\\d)/i),
         members: Joi.array().items(member),
+    },
+    query: {
+        page: Joi.number().integer().min(1),
+        limit: Joi.number().integer().min(2).max(10),
     }
 };

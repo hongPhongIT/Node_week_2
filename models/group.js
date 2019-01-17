@@ -16,17 +16,18 @@ const groupSchema = new Schema({
     },
     author: {
         type: Schema.Types.ObjectId,
-        ref: 'users',
+        ref: 'User',
         required: [true, 'Author is require'],
     },
     members: [{
         type:  Schema.Types.ObjectId,
+        ref: 'User',
     }],
-    deleteAt: {
+    deletedAt: {
         type: String,
         default: null,
     }
-});
+}, {timeStamp: true});
 // arrow function => override this variable
 groupSchema.pre('save', async function (next) {
     try {
@@ -47,15 +48,19 @@ groupSchema.pre('save', async function (next) {
 
 groupSchema.pre('update', async function (next) {
     try {
-        const members = this._update._group.members;
-        let _members = deduplicate(members);
-        const users = await User.find({_id:  { "$in": _members}});
-        const user = await User.findById({_id: this._update._group.author });
-        if (users.length !== _members) {
+        const { members, author } = this._update._group;
+        const setOfMembers = new Set();
+        for (const member of members) {
+            setOfMembers.add(member);
+        }
+        const addedMember = Array.from(setOfMembers);
+        const _members = await User.find({ _id:  { "$in": addedMember } }).select('_id').lean(true);
+        const _author = await User.find({ _id: author }).select('_id').lean(true);
+        if (_members.length !== addedMember.length) {
             const err = new Error('Member is not found');
             return next(err);
         }
-        if (user.length === 0) {
+        if (_author.length === 0) {
             const err = new Error('Member is not found');
             return next(err);
         }
@@ -63,22 +68,6 @@ groupSchema.pre('update', async function (next) {
         return next(e);
     }
 });
-
-function deduplicate(members) {
-    let __members = [];
-    members.map(member => {
-        __members.push(member.toString());
-    })
-    let isExist = (array, x) => array.indexOf(x) > -1;
-    let _members = [];
-    for (let i = 0; i < __members.length; i++) {
-        if(!isExist(_members, __members[i])) {
-            console.log(__members[i]);
-            _members.push(__members[i])
-        }
-    }
-    return _members;
-}
 
 const Group = mongoose.model('groups', groupSchema);
 

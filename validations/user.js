@@ -25,6 +25,6 @@ module.exports.changePassword = {
     body: {
         oldPassword: Joi.string().min(6).max(30).required(),
         newPassword: Joi.string().min(6).max(30).required(),
-        reEnterNewPassword: Joi.string().min(6).max(30).required(),
+        confirmPassword: Joi.any().valid(Joi.ref('newPassword')).required(),
     }
 }
