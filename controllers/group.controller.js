@@ -1,5 +1,5 @@
 import Group from '../models/group';
-
+import { ResponseHandler } from '../helper';
 const GroupController = {};
 
 GroupController.getAll = async (req, res, next) => {
@@ -22,7 +22,7 @@ GroupController.getAll = async (req, res, next) => {
             .sort({ createAt: -1 })
             .skip(skip)
             .limit(parseInt(limit));
-        return res.status(200).json({ isSuccess: true, groups: groups });
+            ResponseHandler.returnSuccess(res, groups);
     } catch (e) {
         return next(e);
     }
@@ -32,7 +32,7 @@ GroupController.getGroup = async (req, res, next) => {
     const groupId = req.params.id;
     try {
         const group = await Group.find({ _id: groupId, deletedAt: null }).lean(true);
-        return res.status(200).json({ isSuccess: true, group: group });
+        ResponseHandler.returnSuccess(res, group);
     } catch (e) {
         return next(e);
     }
@@ -49,10 +49,7 @@ GroupController.addGroup = async (req, res, next) => {
             members,
         });
         await group.save();
-        return res.json({
-            isSuccess: true,
-            group: group
-        });
+        ResponseHandler.returnSuccess(res, group);
     } catch (e) {
         return next(e);
     }
@@ -86,7 +83,7 @@ GroupController.updateGroup = async (req, res, next) => {
                 });
             }
             await group.update({_group});
-            return res.status(200).json({isSuccess: true, group: group});
+            ResponseHandler.returnSuccess(res, group);
         }
     } catch (e) {
         return next(e);
@@ -103,7 +100,7 @@ GroupController.deleteGroup = async (req, res, next) => {
             const date = new Date();
             group.deletedAt = date;
             await group.update(group);
-            return res.status(200).json({ isSuccess: true, group: group });
+            ResponseHandler.returnSuccess(res, group);
         }
     } catch (e) {
         return next(e);

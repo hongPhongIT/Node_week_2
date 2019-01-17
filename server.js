@@ -3,6 +3,7 @@ import bodyParser from 'body-parser';
 import connectToDb from './db/connect';
 import user from './routes/user.routes';
 import chat from './routes/chat.routes';
+import uploadFile from './routes/upload-file.routers';
 import group from './routes/group.routers';
 import message from './routes/message.routers';
 
@@ -19,6 +20,7 @@ server.use(user);
 server.use(chat);
 server.use(group);
 server.use(message);
+server.use(uploadFile);
 
 server.use( (err, req, res, next) => {
     return res.status(500).json({

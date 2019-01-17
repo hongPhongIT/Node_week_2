@@ -1,19 +1,16 @@
 import User from '../models/user';
-const bcrypt = require('bcrypt');
-const saltRounds = 10;
 const SECRETKEY = '/\@3dhmd@\/"';
+const bcrypt = require('bcrypt');
 import JWT from 'jsonwebtoken';
 
-const UserController = {};
+import { StringHandler, ResponseHandler } from '../helper'
 
+const UserController = {};
 
 UserController.getAll = async (req, res, next) => {
     try {
         const users = await User.find({ deleteAt: null }).lean(true);
-        return res.json({
-            isSuccess: true,
-            users,
-        });
+        ResponseHandler.returnSuccess(res, users);
     } catch (e) {
         return next(e);
     }
@@ -27,7 +24,7 @@ UserController.getUser = async (req, res, next) => {
             return res.status(400).json({ isSuccess: false, message: 'User is not found' });
         } else {
             delete user.password;
-            return res.status(200).json({ isSuccess: true, user: user });
+        ResponseHandler.returnSuccess(res, user);
         }
     } catch (e) {
         return next(e);
@@ -42,15 +39,11 @@ UserController.addUser = async (req, res, next) => {
         });
         delete user._doc.deleteAt;
         const password = user.password;
-        const salt = await bcrypt.genSaltSync(saltRounds);
-        const hash = await bcrypt.hashSync(password, salt);
+        const hash = await StringHandler.hashStringToBcryt(password);
         user.password = hash;
         await user.save();
         delete user._doc.password;
-        return res.json({
-            isSuccess: true,
-            user: user
-        })
+        ResponseHandler.returnSuccess(res, user);
     } catch (e) {
         return next(e);
     }
@@ -73,7 +66,7 @@ UserController.updateUser = async (req, res, next) => {
             }
             User.update(_user);
             delete user.password;
-            return res.status(200).json({ isSuccess: true, user: user });
+            ResponseHandler.returnSuccess(res, user);
         }
     } catch (e) {
         return next(e);
@@ -93,11 +86,7 @@ UserController.login = async (req, res, next) => {
         }
         delete user.password;
         const token = await JWT.sign(user, SECRETKEY);
-        return res.json({
-            isSuccess: true,
-            user,
-            token
-        });
+        ResponseHandler.returnSuccess(res, { user, token });
     } catch (e) {
         return next(e);
     }
@@ -114,7 +103,7 @@ UserController.deleteUser = async (req, res, next) => {
             user.deleteAt = date;
             await User.update(user);
             delete user.password;
-            return res.status(200).json({ isSuccess: true, user: user });
+            ResponseHandler.returnSuccess(res, user);
         }
     } catch (e) {
         return next(e);
@@ -133,13 +122,9 @@ UserController.changePassword = async (req, res, next) => {
             return next(new Error('Password is not correct'));
         }
 
-        const salt = await bcrypt.genSaltSync(saltRounds);
-        const hash = await bcrypt.hashSync(newPassword, salt);
-        user.password = hash;
-        await User.update({_id: UserId}, {$set: { password: password }});
-        return res.status(200).json({
-            isSuccess: true,
-        });
+        const hash = await StringHandler.hashStringToBcryt(newPassword);
+        await User.update({_id: UserId}, {$set: { password: hash }});
+        ResponseHandler.returnSuccess(res, {});
     } catch (e) {
         return next(e);
     }

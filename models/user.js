@@ -2,7 +2,12 @@ import mongoose from 'mongoose';
 const Schema = mongoose.Schema;
 
 let userSchema = new Schema({
-    gender: Boolean,
+    gender: {
+        type: String,
+        emun: ['Male', 'Fimale', 'Other'],
+        required: [true, 'Gender is require'],
+        default: 'Other'
+    },
     fullName: {
         firstName: {
             type: String,
@@ -27,7 +32,7 @@ let userSchema = new Schema({
         max: [30, 'Password too long'],
         min: [6, 'Password too sort'],
     },
-    deleteAt: {
+    deletedAt: {
         type: String,
         default: null,
     }

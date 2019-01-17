@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import User from "./user";
-import index from "../config";
+
 const Schema = mongoose.Schema;
 
 const groupSchema = new Schema({
@@ -23,6 +23,11 @@ const groupSchema = new Schema({
         type:  Schema.Types.ObjectId,
         ref: 'User',
     }],
+    type: {
+        type:  String,
+        enum: ['private', 'public'],
+        default: 'private',
+    },
     deletedAt: {
         type: String,
         default: null,
@@ -37,7 +42,7 @@ groupSchema.pre('save', async function (next) {
             const err = new Error('Member is not found');
             return next(err);
         }
-        if (user.length === 0) {
+        if (user === null) {
             const err = new Error('Member is not found');
             return next(err);
         }

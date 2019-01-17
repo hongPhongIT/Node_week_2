@@ -7,10 +7,7 @@ const MessageController = {};
 MessageController.getAll = async (req, res, next) => {
     try {
         const messages = await Message.find({ deletedAt: null }).lean(true);
-        return res.json({
-            isSuccess: true,
-            messages,
-        });
+        ResponseHandler.returnSuccess(res, messages);
     } catch (e) {
         return next(e);
     }
@@ -21,9 +18,9 @@ MessageController.getMessage = async (req, res, next) => {
     try {
         const message = await Message.findOne({ _id: messageId, deletedAt: null }).lean(true);
         if (!message) {
-            return res.status(400).json({ isSuccess: false, message: 'Message is not found' });
+            ResponseHandler.returnSuccess(res, { message: 'Message is not found' });
         } else {
-            return res.status(200).json({ isSuccess: true, message: message });
+            ResponseHandler.returnSuccess(res,  message );
         }
     } catch (e) {
         return next(e);
@@ -38,10 +35,7 @@ MessageController.addMessage = async (req, res, next) => {
         });
         delete message._doc.deletedAt;
         await message.save();
-        return res.json({
-            isSuccess: true,
-            message: message
-        })
+        ResponseHandler.returnSuccess(res,  message );
     } catch (e) {
         return next(e);
     }
@@ -53,10 +47,10 @@ MessageController.updateMessage = async (req, res, next) => {
         const { message } = req.body;
         const _message = await Message.findOne({ _id: messageId, deletedAt: null }).select('message').lean(true);
         if (!_message) {
-            return res.status(400).json({ isSuccess: false, message: 'Message is not found' });
+            ResponseHandler.returnSuccess(res, { message: 'Message is not found' });
         } else {
             await Message.update({ _id: messageId }, { '$set': { message } });
-            return res.status(200).json({ isSuccess: true, message: message });
+            ResponseHandler.returnSuccess(res,  message );
         }
     } catch (e) {
         return next(e);
@@ -73,7 +67,7 @@ MessageController.deleteMessage = async (req, res, next) => {
             const date = new Date();
             message.deletedAt = date;
             await Message.update({ _id: messageId }, { '$set': { message } });
-            return res.status(200).json({ isSuccess: true, message: message });
+            ResponseHandler.returnSuccess(res,  message );
         }
     } catch (e) {
         return next(e);

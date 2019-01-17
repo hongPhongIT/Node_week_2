@@ -1,4 +1,5 @@
 const bcrypt = require('bcrypt');
+
 const saltRounds = 10;
 
 export default class StringHandler {
