@@ -3,6 +3,6 @@ import UploadFile from '../helper/upload-file';
 const router = new Router();
 
 // Get all users
-router.post('/upload-file', UploadFile);
+router.post('/:id/upload-file', UploadFile);
 
 export default router;
