@@ -2,6 +2,8 @@ import User from '../models/user';
 const SECRETKEY = '/\@3dhmd@\/"';
 const bcrypt = require('bcrypt');
 import JWT from 'jsonwebtoken';
+const nodemailer = require("nodemailer");
+
 
 import { StringHandler, ResponseHandler } from '../helper'
 
@@ -112,6 +114,46 @@ UserController.deleteUser = async (req, res, next) => {
 
 UserController.changePassword = async (req, res, next) => {
     try {
+        "use strict";
+// async..await is not allowed in global scope, must use a wrapper
+async function main(){
+
+  // Generate test SMTP service account from ethereal.email
+  // Only needed if you don't have a real mail account for testing
+  let account = await nodemailer.createTestAccount();
+
+  // create reusable transporter object using the default SMTP transport
+  let transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 465,
+    // secure: false, // true for 465, false for other ports
+    auth: {
+      user: 'support@hearti.io', // generated ethereal user
+      pass: '$WellieMy$1' // generated ethereal password
+    }
+  });
+
+  // setup email data with unicode symbols
+  let mailOptions = {
+    from: '"Fred Foo 👻" <foo@example.com>', // sender address
+    to: "phong.nguyen@student.passerellesnumeriques.org", // list of receivers
+    subject: "Hello ✔", // Subject line
+    text: "Hello world?", // plain text body
+    html: "<b>Hello world?</b>" // html body
+  };
+
+  // send mail with defined transport object
+  let info = await transporter.sendMail(mailOptions)
+
+  console.log("Message sent: %s", info.messageId);
+  // Preview only available when sending through an Ethereal account
+  console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+
+  // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+  // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+}
+
+main().catch(console.error);
         const { password } = req.user;
         console.log( req.user)
         const UserId = req.params.id;
