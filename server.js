@@ -6,6 +6,7 @@ import chat from './routes/chat.routes';
 import uploadFile from './routes/upload-file.routers';
 import group from './routes/group.routers';
 import message from './routes/message.routers';
+const path = require('path');
 
 const server = express();
 
@@ -30,6 +31,7 @@ server.use( (err, req, res, next) => {
     });
 });
 
+server.use('/static', express.static(path.join(__dirname, 'uploads')));
 
 server.listen(3000, () => {
     console.log('Server started at: 3000');
