@@ -43,7 +43,7 @@ const UploadFile = async (req, res, next) => {
                     console.log(checkUpdateTime)
                     if ( total > 10 && checkUpdateTime < 1 ) {
                         await _upload.update({ blockUploadAt: new Date() });
-                        return next(new Error('Opp! You can not update 10 files until 1 second'))
+                        return next(new Error('OOPs! You can not update 10 files until 1 second'))
                     } 
                     return res.status(200).json({
                         isUpload: true
