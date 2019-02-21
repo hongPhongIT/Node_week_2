@@ -28,16 +28,26 @@
       }
 
       socket.on('sendingMessage', function(data){
-          let eleLi =  document.getElementById('messages');
-          const li = document.createElement("li");
-          li.appendChild(document.createTextNode(data.message));
-          eleLi.appendChild(li);
+        let eleLi =  document.getElementById('messages');
+        const li = document.createElement("li");
+        li.appendChild(document.createTextNode(data.message));
+        eleLi.appendChild(li);
+      });
+
+      socket.on('nice game', function(data){
+       alert(data);
+      });
+
+      function typingMessage() {
+        socket.emit('sendingTyping', {
+          message: 'A is typing message',
         });
+      }
     </script>
   <body>
     <ul id="messages"></ul>
     <form action="" onsubmit="return false">
-      <input id="m" autocomplete="off" /><button onclick="sendMessage()">Send</button>
+      <input id="m" autocomplete="off" onkeypress="typingMessage()"/><button onclick="sendMessage()">Send</button>
     </form>
   </body>
 </html>

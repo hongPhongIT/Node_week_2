@@ -17,11 +17,12 @@ const io = require('socket.io')(http);
 
 io.on('connection', function(socket){
     console.log('a user connected');
-
+    socket.join('game');
     socket.on('sendingMessage', function(data) {
         console.log('Get data on event sendingMessage');
         console.log(data);
-        socket.broadcast.emit(data);
+        socket.to('game').emit('nice game', "let's play a game");
+        // socket.broadcast.emit('sendingMessage', data);
     });
 
     socket.on('sendingTyping', function(data) {
