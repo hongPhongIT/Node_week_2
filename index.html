@@ -43,11 +43,35 @@
           message: 'A is typing message',
         });
       }
+
+      function createGroup() {
+        socket.emit(
+            'creatingGroup',
+            {
+                // authorId: 'A',
+                name: 'Chem gio',
+                members: [1, 2],
+                lastMessage: '5c70ba241154623e68718241',
+                author: '5c70ba241154623e68718241',
+                members: ['5c70ba241154623e68718241', '5c70ba241154623e68718241'],
+                type: 'private'
+            },
+            function(error, data) {
+                if (error) {
+                    console.log(error);
+                    return alert('asdf');
+                }
+                console.log(data);
+            }
+        );
+    }
     </script>
   <body>
     <ul id="messages"></ul>
     <form action="" onsubmit="return false">
-      <input id="m" autocomplete="off" onkeypress="typingMessage()"/><button onclick="sendMessage()">Send</button>
+      <input id="m" autocomplete="off" onkeypress="typingMessage()"/>
+      <button onclick="sendMessage()">Send</button>
+      <button onclick="createGroup()">Create group</button>
     </form>
   </body>
 </html>

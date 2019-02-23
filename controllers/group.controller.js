@@ -39,7 +39,9 @@ GroupController.getGroup = async (req, res, next) => {
 
 };
 
-GroupController.addGroup = async (req, res, next) => {
+GroupController.addGroup = async (req, res, next = (e) => {
+    return Promise.reject(e);
+}) => {
     try {
         const { name, lastMessage, author, members } = req.body;
         const group = new Group({
@@ -86,6 +88,7 @@ GroupController.updateGroup = async (req, res, next) => {
             ResponseHandler.returnSuccess(res, group);
         }
     } catch (e) {
+        console.log(e);
         return next(e);
     }
 };

@@ -5,7 +5,7 @@ const SECRETKEY = '/\@3dhmd@\/"';
 export default class Authentication {
    static async auth(req, res, next) {
       try {
-         const token = req.headers.token || req.body.token || req.query.token;
+         const token = req.query.token || req.headers.token || req.body.token;
          if (!token) {
             return next(new Error('Not found authentication'));
          }

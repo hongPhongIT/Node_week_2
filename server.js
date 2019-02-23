@@ -6,6 +6,8 @@ import chat from './routes/chat.routes';
 import uploadFile from './routes/upload-file.routers';
 import group from './routes/group.routers';
 import message from './routes/message.routers';
+import GroupController from './controllers/group.controller';
+import MessageController from './controllers/message.controller';
 const path = require('path');
 
 
@@ -15,14 +17,35 @@ const server = express();
 const http = require('http').Server(server);
 const io = require('socket.io')(http);
 
-io.on('connection', function(socket){
-    console.log('a user connected');
-    socket.join('game');
+io
+// .use(async function (socket, next) {
+//     console.log(socket.id);
+//     const { token } = socket.handshake.query;
+//     try {
+//         await Authentication.auth(
+//             {
+//                 socket,
+//                 query: {
+//                     token
+//                 }
+//             },
+//             null,
+//             next
+//         );
+//         return next();
+//     } catch (e) {
+//         return next(e);
+//     }
+// })
+.on('connection', function(socket){
+    console.log('user is connected');
+    /*
+    * Start initializing event
+    * */
     socket.on('sendingMessage', function(data) {
         console.log('Get data on event sendingMessage');
         console.log(data);
-        socket.to('game').emit('nice game', "let's play a game");
-        // socket.broadcast.emit('sendingMessage', data);
+        socket.broadcast.emit('sendingMessage', data);
     });
 
     socket.on('sendingTyping', function(data) {
@@ -30,6 +53,43 @@ io.on('connection', function(socket){
         console.log(data);
     });
 
+    socket.on('creatingGroup', async function(data, callback) {
+        // Validation.
+        // Call to controller.
+        try {
+            const group = await GroupController.addGroup({
+                user: socket.user,
+                body: data
+            });
+            return callback(null, group);
+        } catch (e) {
+            console.log(e);
+            if (callback) {
+                return callback(e);
+            }
+        }
+    });
+
+    socket.on('creatingMessage', async function(data, callback) {
+        // Validation.
+        // Call to controller.
+        try {
+            const message = await MessageController.addMessage({
+                user: socket.user,
+                body: data
+            });
+            return callback(null, message);
+        } catch (e) {
+            console.log(e);
+            if (callback) {
+                return callback(e);
+            }
+        }
+    });
+
+    /*
+    * Start initializing event
+    * */
     socket.on('disconnect', function() {
         console.log('user disconnected');
     });

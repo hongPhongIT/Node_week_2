@@ -36,16 +36,16 @@ const groupSchema = new Schema({
 // arrow function => override this variable
 groupSchema.pre('save', async function (next) {
     try {
-        const users = await User.find({_id:  { "$in": this.members}});
-        const user = await User.findById({_id: this.author });
-        if (users.length !== this.members.length) {
-            const err = new Error('Member is not found');
-            return next(err);
-        }
-        if (user === null) {
-            const err = new Error('Member is not found');
-            return next(err);
-        }
+        // const users = await User.find({_id:  { "$in": this.members}});
+        // const user = await User.findById({_id: this.author });
+        // if (users.length !== this.members.length) {
+        //     const err = new Error('Member is not found');
+        //     return next(err);
+        // }
+        // if (user === null) {
+        //     const err = new Error('Member is not found');
+        //     return next(err);
+        // }
     } catch (e) {
         return next(e);
     }
