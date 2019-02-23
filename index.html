@@ -15,7 +15,7 @@
   </head>
     <script src="/js/socket.io.js"></script>
     <script>
-      const socket = io();
+      const socket = io('http://localhost:3000/?token=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1YzMyMjcyOGY1YWM5YzI3MjRkZDc4NTUiLCJkZWxldGVBdCI6Ik1vbiBKYW4gMDcgMjAxOSAwMTo1ODo0MCBHTVQrMDcwMCAoSW5kb2NoaW5hIFRpbWUpIiwiZnVsbE5hbWUiOnsiZmlyc3ROYW1lIjoiTmd1eWVuIiwibGFzdE5hbWUiOiJQYXNzd29yZCJ9LCJlbWFpbCI6ImhvbmdwaG9uZ0BnbWFpbC5jb20iLCJnZW5kZXIiOnRydWUsIl9fdiI6MCwiaWF0IjoxNTUwNzUyNzUwfQ.2Tq20MY0uKfTGmYdqpQsBjdoMRjPVXb3L-vvxs3J_Tk');
       function sendMessage() {
         let message = document.getElementById('m').value;
         message = message.trim();
@@ -27,15 +27,19 @@
         }
       }
 
-      socket.on('sendingMessage', function(data){
+      socket.on('sendingMessage', function(data) {
         let eleLi =  document.getElementById('messages');
         const li = document.createElement("li");
         li.appendChild(document.createTextNode(data.message));
         eleLi.appendChild(li);
       });
 
-      socket.on('nice game', function(data){
+      socket.on('nice game', function(data) {
        alert(data);
+      });
+
+      socket.on('error', function(error) {
+       console.log(error);
       });
 
       function typingMessage() {
@@ -47,7 +51,7 @@
   <body>
     <ul id="messages"></ul>
     <form action="" onsubmit="return false">
-      <input id="m" autocomplete="off" onkeypress="typingMessage()"/><button onclick="sendMessage()">Send</button>
+      <input id="m" autocomplete="off"/><button onclick="sendMessage()">Send</button>
     </form>
   </body>
 </html>
