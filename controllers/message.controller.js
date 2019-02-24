@@ -1,5 +1,6 @@
 import Message from '../models/message';
 import { ResponseHandler } from '../helper';
+import { rejects } from 'assert';
 
 const MessageController = {};
 
@@ -28,14 +29,16 @@ MessageController.getMessage = async (req, res, next) => {
 
 };
 
-MessageController.addMessage = async (req, res, next) => {
+MessageController.addMessage = async (req, res, next = (e) => {
+    return Promise.rejects(e);
+}) => {
     try {
         const message = new Message({
             ...req.body
         });
         delete message._doc.deletedAt;
         await message.save();
-        ResponseHandler.returnSuccess(res,  message );
+        return ResponseHandler.returnSuccess(res,  message );
     } catch (e) {
         return next(e);
     }

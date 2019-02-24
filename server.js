@@ -6,8 +6,7 @@ import chat from './routes/chat.routes';
 import uploadFile from './routes/upload-file.routers';
 import group from './routes/group.routers';
 import message from './routes/message.routers';
-import  Authentication from './middlewares/authentication';
-import MessageController from './controllers/message.controller';
+import SocketHelper from './socket-handler';
 const path = require('path');
 
 
@@ -15,56 +14,8 @@ const path = require('path');
 
 const server = express();
 const http = require('http').Server(server);
-const io = require('socket.io')(http);
 
-io.use( async function(socket, next) {
-    const { token } = socket.handshake.query;
-    try {
-        // console.log(query);
-        await Authentication.auth(
-            { 
-                query: { 
-                    token 
-                } 
-            },
-             null,
-             next
-        );
-        return next();
-    } catch (e) {
-        return next(e);        
-    }
-});
-
-io.on('connection', function(socket){
-    console.log('a user connected');
-    socket.on('sendingMessage', async function(data) {
-        try {
-            await MessageController.addMessage(
-                {
-                    body: data
-                },
-                null,
-                null
-            )
-            return new Error('Send message success');
-        } catch (e) {
-            return new Error('Can not send message');
-        }
-        // socket.to('game').emit('nice game', "let's play a game");
-        // socket.broadcast.emit('sendingMessage', data);
-    });
-
-    socket.on('sendingTyping', function(data) {
-        console.log('Get data on event sendingTyping');
-        console.log(data);
-    });
-
-    socket.on('disconnect', function() {
-        console.log('user disconnected');
-    });
-});
-
+SocketHelper.initSocket(http);
 server.use(express.static('public'))
 
 connectToDb();

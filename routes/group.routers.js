@@ -9,6 +9,8 @@ const validate = require('express-validation')
 router.get('/groups', GroupController.getAll);
 // Get group by id
 router.get('/groups/:id', validate(group.params), GroupController.getGroup);
+
+router.get('/groups/:id/active', validate(group.params), GroupController.getActiveGroup);
 // Create group
 router.post('/groups', validate(group.body), GroupController.addGroup);
 // Update group

@@ -39,7 +39,21 @@ GroupController.getGroup = async (req, res, next) => {
 
 };
 
-GroupController.addGroup = async (req, res, next) => {
+GroupController.getActiveGroup = async (req, res, next) => {
+    const userId = req.params.id;
+    try {
+        console.log(userId);
+        const group = await Group.find({ members: { $in:[ userId ] }, deletedAt: null }).lean(true);
+        return ResponseHandler.returnSuccess(res, group);
+    } catch (e) {
+        return next(e);
+    }
+
+};
+
+GroupController.addGroup = async (req, res, next = (e) => {
+    return Promise.reject(e);
+}) => {
     try {
         const { name, lastMessage, author, members } = req.body;
         const group = new Group({
@@ -86,6 +100,7 @@ GroupController.updateGroup = async (req, res, next) => {
             ResponseHandler.returnSuccess(res, group);
         }
     } catch (e) {
+        console.log(e);
         return next(e);
     }
 };
