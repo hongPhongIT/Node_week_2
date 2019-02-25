@@ -1,6 +1,6 @@
-import  Authentication from '../middlewares/authentication';
 import GroupEventHandler from './group-event-handler';
 import MessageEventHandler from './message-event-handler';
+import Authentication from './authentication-handler';
 
 export default class SocketHelper {
 
@@ -8,23 +8,7 @@ export default class SocketHelper {
         const io = require('socket.io')(http);
 
         io.use(async function (socket, next) {
-            console.log(socket.id);
-            const { token } = socket.handshake.query;
-            try {
-                await Authentication.auth(
-                    {
-                        socket,
-                        query: {
-                            token
-                        }
-                    },
-                    null,
-                    next
-                );
-                return next();
-            } catch (e) {
-                return next(e);
-            }
+            Authentication.initAuth(socket, next);
         })
         .on('connection', async function(socket){
             console.log('user is connected');

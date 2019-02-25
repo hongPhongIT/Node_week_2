@@ -68,8 +68,24 @@ function createMessage() {
   );
 }
 
+// function login() {
+//   const token = document.getElementById('token').innerHTML;
+
+//   socket.emit('login', { token: token },
+//   function(error, data) {
+//     if (error) {
+//       console.log(error);
+//     }
+//     console.log(data);
+//   });
+// }
+
 function getActiveGroup() {
-    const token = document.getElementById('token').innerHTML;
-    console.log(token);
-    socket.on('ge')
+  $.ajax({
+    type: "GET",
+    url: 'http://localhost:3000/groups/5c322728f5ac9c2724dd7855/active',
+    success: function(data){
+        console.log(data);//This will alert Success which is sent as the response to the ajax from the server
+    }
+ });
 }
