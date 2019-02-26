@@ -30,9 +30,26 @@ GroupController.getAll = async (req, res, next) => {
 
 GroupController.getGroup = async (req, res, next) => {
     const groupId = req.params.id;
+    // try {
+    //     const group = await Group.find({ _id: groupId, deletedAt: null }).lean(true);
+    //     ResponseHandler.returnSuccess(res, group);
+    // } catch (e) {
+    //     return next(e);
+    // }
     try {
-        const group = await Group.find({ _id: groupId, deletedAt: null }).lean(true);
-        ResponseHandler.returnSuccess(res, group);
+        const group = await Group
+            .find({ _id: groupId, deletedAt: null })
+            .populate([
+                {
+                    path: 'author',
+                    select: 'fullName'
+                },
+                {
+                    path: 'lastMessage',
+                    select: 'message'
+                }
+            ]);
+        return ResponseHandler.returnSuccess(res, group);
     } catch (e) {
         return next(e);
     }
@@ -43,7 +60,18 @@ GroupController.getActiveGroup = async (req, res, next) => {
     const userId = req.params.id;
     try {
         console.log(userId);
-        const group = await Group.find({ members: { $in:[ userId ] }, deletedAt: null }).lean(true);
+        const group = await Group.find({ members: { $in:[ userId ] }, deletedAt: null })
+        .populate([
+            {
+                path: 'members',
+                select: 'fullName'
+            },
+            {
+                path: 'lastMessage',
+                select: 'message'
+            }
+        ])
+        .lean(true);
         return ResponseHandler.returnSuccess(res, group);
     } catch (e) {
         return next(e);
@@ -83,8 +111,11 @@ GroupController.updateGroup = async (req, res, next) => {
                 author: group.author,
                 members: group.members,
             };
-            if (name !== undefined)
+
+            if (name !== undefined) {
                 _group.name = name;
+            }
+
             if (lastMessage !== undefined) {
                 _group.lastMessage = lastMessage;
             }
@@ -96,8 +127,8 @@ GroupController.updateGroup = async (req, res, next) => {
                     _group.members.push(member);
                 });
             }
-            await group.update({_group});
-            ResponseHandler.returnSuccess(res, group);
+            await group.update(_group);
+            return ResponseHandler.returnSuccess(res, group);
         }
     } catch (e) {
         console.log(e);

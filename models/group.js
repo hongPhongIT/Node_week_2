@@ -11,7 +11,7 @@ const groupSchema = new Schema({
     },
     lastMessage: {
         type: Schema.Types.ObjectId,
-        ref: 'chats',
+        ref: 'Message',
         required: [true, 'Last message is require'],
     },
     author: {

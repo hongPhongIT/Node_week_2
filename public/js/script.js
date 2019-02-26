@@ -80,12 +80,47 @@ function createMessage() {
 //   });
 // }
 
+function groupHtmlElement(group) {
+  const HtmlElement = `
+    <div class="chat_list">
+      <div class="chat_people" id=`+ group._id +`>
+        <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
+        <div class="chat_ib">
+          <h5>`+ group.name +` <span class="chat_date">Dec 25</span></h5>
+          <p>`+ group.lastMessage +`</p>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const listChatBlock = $('.inbox_chat');
+  listChatBlock.append(HtmlElement);
+}
+
+function appendGroup(group) {
+  if (group.type === 'private') {
+    const _group = group;   
+    group.members.map(partner =>  {
+      if (partner._id !== '5c749ea4c1b15ab38801f889') {
+          _group.name = partner.fullName.firstName + ' ' + partner.fullName.lastName;
+          groupHtmlElement(group);
+      }
+    })
+  } else {
+    groupHtmlElement(group);
+  }
+  return false;
+}
+
+
 function getActiveGroup() {
   $.ajax({
     type: "GET",
-    url: 'http://localhost:3000/groups/5c322728f5ac9c2724dd7855/active',
+    url: 'http://localhost:3000/groups/5c749ea4c1b15ab38801f889/active',
     success: function(data){
-        console.log(data);//This will alert Success which is sent as the response to the ajax from the server
+      if (data.data.length !== 0) {
+        data.data.map(group => appendGroup(group));
+      }
     }
  });
 }
