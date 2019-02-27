@@ -82,7 +82,7 @@ function createMessage() {
 
 function groupHtmlElement(group) {
   const HtmlElement = `
-    <div class="chat_list">
+    <div class="chat_list" onclick="">
       <div class="chat_people" id=`+ group._id +`>
         <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
         <div class="chat_ib">
