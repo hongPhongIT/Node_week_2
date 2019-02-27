@@ -114,13 +114,45 @@ function appendGroup(group) {
 
 
 function getActiveGroup() {
+  const user = JSON.parse(window.localStorage.getItem('user'));
+  if (user === null) {
+    location.replace("http://localhost:3000/login");
+  }
+  console.log(user);
   $.ajax({
     type: "GET",
-    url: 'http://localhost:3000/groups/5c749ea4c1b15ab38801f889/active',
+    url: 'http://localhost:3000/groups/'+ user.user._id +'/active',
     success: function(data){
       if (data.data.length !== 0) {
         data.data.map(group => appendGroup(group));
       }
     }
  });
+}
+
+function login() {
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  $.ajax({
+    type: "POST",
+    dataType: "json",
+    data: {
+      "email": email,
+      "password": password
+    },
+    headers: {
+      "accept": "application/json",
+      "Access-Control-Allow-Origin":"*"
+    },
+    url: "http://localhost:3000/login",
+    success: function (result) {
+      if (result.isSuccess === true) {
+        window.localStorage.setItem('user', JSON.stringify(result.data));
+        location.replace("http://localhost:3000");          
+      }
+    },
+    // error: function (e) {
+    // 		console.log(e);
+    // }
+  });
 }
