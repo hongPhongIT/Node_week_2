@@ -99,9 +99,10 @@ function groupHtmlElement(group) {
 
 function appendGroup(group) {
   if (group.type === 'private') {
+    console.log(group);
     const _group = group;   
     group.members.map(partner =>  {
-      if (partner._id !== '5c749ea4c1b15ab38801f889') {
+      if (partner._id !== '5c348d3d129b7e2614f54ba4') {
           _group.name = partner.fullName.firstName + ' ' + partner.fullName.lastName;
           groupHtmlElement(group);
       }
@@ -116,7 +117,7 @@ function appendGroup(group) {
 function getActiveGroup() {
   $.ajax({
     type: "GET",
-    url: 'http://localhost:3000/groups/5c749ea4c1b15ab38801f889/active',
+    url: 'http://localhost:3000/groups/5c322728f5ac9c2724dd7855/active',
     success: function(data){
       if (data.data.length !== 0) {
         data.data.map(group => appendGroup(group));
