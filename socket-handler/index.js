@@ -25,6 +25,7 @@ export default class SocketHelper {
             });
 
             GroupEventHandler.initEvent(socket);
+            GroupEventHandler.getActiveGroup(socket);
             MessageEventHandler.initEvent(socket);
 
             socket.on('disconnect', function() {

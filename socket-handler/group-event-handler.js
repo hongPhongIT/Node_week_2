@@ -12,7 +12,6 @@ export default class GroupEventHandler {
                 });
                 return callback(null, group);
             } catch (e) {
-                console.log(e);
                 if (callback) {
                     return callback(e);
                 }
@@ -21,12 +20,23 @@ export default class GroupEventHandler {
     }
 
     static getActiveGroup(socket) {
-        socket.on('loadingPage', async function(data, callback) {
-            const groups = await GroupController.getActiveGroup('5c322728f5ac9c2724dd7855');
-            if ( groups.length !== 0 ) {
-                for (const item of groups) {
-                    socket.join(item);
-                } 
+        socket.on('joinGroup', async function(data, callback) {
+            try {
+                const groups = await GroupController.getActiveGroup({
+                    params: {
+                        id: data.id,
+                    }
+                });
+                if ( groups.length !== 0 ) {
+                    for (const item of groups) {
+                        socket.join(item);
+                    } 
+                }
+                return callback(null, groups); 
+            } catch (e) {
+                if (callback) {
+                    return callback(e);
+                }
             }
         })
     }

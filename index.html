@@ -107,8 +107,14 @@
   <script src="/js/script.js"></script>
   <body onload="getActiveGroup()">
     <div class="container">
+      <nav class="navbar navbar-light bg-light justify-content-between">
+        <form class="form-inline" onsubmit="return false">
+          <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" id="serch-friend">
+          <button class="btn btn-outline-success my-2 my-sm-0" type="submit" onclick="searchFriend()">Search</button>
+        </form>
+        <a class="navbar-brand">Navbar</a>
+      </nav>
       <h3 class=" text-center">Messaging</h3>
-      <p id="token" style="visibility:hidden">Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1YzMyMjcyOGY1YWM5YzI3MjRkZDc4NTUiLCJkZWxldGVBdCI6Ik1vbiBKYW4gMDcgMjAxOSAwMTo1ODo0MCBHTVQrMDcwMCAoSW5kb2NoaW5hIFRpbWUpIiwiZnVsbE5hbWUiOnsiZmlyc3ROYW1lIjoiTmd1eWVuIiwibGFzdE5hbWUiOiJQYXNzd29yZCJ9LCJlbWFpbCI6ImhvbmdwaG9uZ0BnbWFpbC5jb20iLCJnZW5kZXIiOnRydWUsIl9fdiI6MCwiaWF0IjoxNTUwNzUyNzUwfQ.2Tq20MY0uKfTGmYdqpQsBjdoMRjPVXb3L-vvxs3J_Tk</p>
       <div class="messaging">
         <div class="inbox_msg">
           <div class="inbox_people">

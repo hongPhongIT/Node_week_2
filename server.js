@@ -30,6 +30,9 @@ server.use(chat);
 server.use(group);
 server.use(message);
 server.use(uploadFile);
+server.get('/login', function(req, res) {
+    res.sendFile(__dirname + '/login.html');
+});
 server.get('/', function(req, res) {
     res.sendFile(__dirname + '/index.html');
 });

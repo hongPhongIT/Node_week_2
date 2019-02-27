@@ -1,6 +1,6 @@
 import Message from '../models/message';
+import GroupController from './group.controller';
 import { ResponseHandler } from '../helper';
-import { rejects } from 'assert';
 
 const MessageController = {};
 
@@ -38,6 +38,13 @@ MessageController.addMessage = async (req, res, next = (e) => {
         });
         delete message._doc.deletedAt;
         await message.save();
+        await GroupController.updateGroup({
+            body: {
+                lastMessage: message._id,
+            }
+        },
+        null,
+        next);
         return ResponseHandler.returnSuccess(res,  message );
     } catch (e) {
         return next(e);

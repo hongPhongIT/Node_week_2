@@ -68,21 +68,10 @@ function createMessage() {
   );
 }
 
-// function login() {
-//   const token = document.getElementById('token').innerHTML;
-
-//   socket.emit('login', { token: token },
-//   function(error, data) {
-//     if (error) {
-//       console.log(error);
-//     }
-//     console.log(data);
-//   });
-// }
-
 function groupHtmlElement(group) {
   const HtmlElement = `
-    <div class="chat_list">
+    <div class="chat_list" onclick="getConversation()">
+      <span style="visibility: hidden;">`+ group._id +`</span>      
       <div class="chat_people" id=`+ group._id +`>
         <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
         <div class="chat_ib">
@@ -97,12 +86,12 @@ function groupHtmlElement(group) {
   listChatBlock.append(HtmlElement);
 }
 
-function appendGroup(group) {
+function appendGroup(group, userId) {
   if (group.type === 'private') {
     console.log(group);
     const _group = group;   
     group.members.map(partner =>  {
-      if (partner._id !== '5c348d3d129b7e2614f54ba4') {
+      if (partner._id !== userId) {
           _group.name = partner.fullName.firstName + ' ' + partner.fullName.lastName;
           groupHtmlElement(group);
       }
@@ -115,13 +104,63 @@ function appendGroup(group) {
 
 
 function getActiveGroup() {
+  const user = JSON.parse(window.localStorage.getItem('user'));
+  if (user === null) {
+    location.replace("http://localhost:3000/login");
+  }
+
+  socket.emit(
+    'joinGroup',
+    {
+      id: user.user._id,
+    },
+    function(error, data) {
+      if (error) {
+        console.log(error);
+      }
+      console.log(data);
+    })
+
   $.ajax({
     type: "GET",
-    url: 'http://localhost:3000/groups/5c322728f5ac9c2724dd7855/active',
+    url: 'http://localhost:3000/groups/'+ user.user._id +'/active',
     success: function(data){
       if (data.data.length !== 0) {
-        data.data.map(group => appendGroup(group));
+        data.data.map(group => appendGroup(group, user.user._id));
       }
     }
  });
+}
+
+function login() {
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  $.ajax({
+    type: "POST",
+    dataType: "json",
+    data: {
+      "email": email,
+      "password": password
+    },
+    headers: {
+      "accept": "application/json",
+      "Access-Control-Allow-Origin":"*"
+    },
+    url: "http://localhost:3000/login",
+    success: function (result) {
+      if (result.isSuccess === true) {
+        window.localStorage.setItem('user', JSON.stringify(result.data));
+        location.replace("http://localhost:3000");          
+      }
+    },
+    // error: function (e) {
+    // 		console.log(e);
+    // }
+  });
+}
+
+function getConversation(id) {
+  const groupId = document.getElementById('groupId').value;
+
+  alert(id);
 }
