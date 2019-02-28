@@ -59,7 +59,6 @@ GroupController.getGroup = async (req, res, next) => {
 GroupController.getActiveGroup = async (req, res, next) => {
     const userId = req.params.id;
     try {
-        console.log(userId);
         const group = await Group.find({ members: { $in:[ userId ] }, deletedAt: null })
         .populate([
             {
@@ -91,7 +90,7 @@ GroupController.addGroup = async (req, res, next = (e) => {
             members,
         });
         await group.save();
-        ResponseHandler.returnSuccess(res, group);
+        return ResponseHandler.returnSuccess(res, group);
     } catch (e) {
         return next(e);
     }
@@ -131,7 +130,6 @@ GroupController.updateGroup = async (req, res, next) => {
             return ResponseHandler.returnSuccess(res, group);
         }
     } catch (e) {
-        console.log(e);
         return next(e);
     }
 };

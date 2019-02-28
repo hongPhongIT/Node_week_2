@@ -52,26 +52,29 @@ groupSchema.pre('save', async function (next) {
 });
 
 groupSchema.pre('update', async function (next) {
-    try {
-        const { members, author } = this._update._group;
-        const setOfMembers = new Set();
-        for (const member of members) {
-            setOfMembers.add(member);
-        }
-        const addedMember = Array.from(setOfMembers);
-        const _members = await User.find({ _id:  { "$in": addedMember } }).select('_id').lean(true);
-        const _author = await User.find({ _id: author }).select('_id').lean(true);
-        if (_members.length !== addedMember.length) {
-            const err = new Error('Member is not found');
-            return next(err);
-        }
-        if (_author.length === 0) {
-            const err = new Error('Member is not found');
-            return next(err);
-        }
-    } catch (e) {
-        return next(e);
-    }
+    // try {
+    //     const { members, author } = this._update._group;
+    //     if (members !== undefined) {
+            
+    //     }
+    //     const setOfMembers = new Set();
+    //     for (const member of members) {
+    //         setOfMembers.add(member);
+    //     }
+    //     const addedMember = Array.from(setOfMembers);
+    //     const _members = await User.find({ _id:  { "$in": addedMember } }).select('_id').lean(true);
+    //     const _author = await User.find({ _id: author }).select('_id').lean(true);
+    //     if (_members.length !== addedMember.length) {
+    //         const err = new Error('Member is not found');
+    //         return next(err);
+    //     }
+    //     if (_author.length === 0) {
+    //         const err = new Error('Member is not found');
+    //         return next(err);
+    //     }
+    // } catch (e) {
+    //     return next(e);
+    // }
 });
 
 const Group = mongoose.model('groups', groupSchema);

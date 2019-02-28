@@ -10,9 +10,11 @@ export default class MessageEventHandler {
                     user: socket.user,
                     body: data
                 });
+                // const io = require('socket.io')(http);
+                console.log(data.group);
+                socket.in(data.group).emit('sendingMessage', message);
                 return callback(null, message);
             } catch (e) {
-                console.log(e);
                 if (callback) {
                     return callback(e);
                 }

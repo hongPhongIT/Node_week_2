@@ -29,6 +29,24 @@ MessageController.getMessage = async (req, res, next) => {
 
 };
 
+MessageController.getMessageByGroup = async (req, res, next = (e) => {
+    return Promise.reject(e);
+}) => {
+    const groupId = req.params.id;
+    try {
+        const messages = await Message.find({ group: groupId, deletedAt: null }).lean(true);
+        if (!messages) {
+            return ResponseHandler.returnSuccess(res, { message: 'Start conversation' });
+        } else {
+            return ResponseHandler.returnSuccess(res,  messages );
+        }
+    } catch (e) {
+        return next(e);
+    }
+
+};
+
+
 MessageController.addMessage = async (req, res, next = (e) => {
     return Promise.rejects(e);
 }) => {
@@ -41,6 +59,9 @@ MessageController.addMessage = async (req, res, next = (e) => {
         await GroupController.updateGroup({
             body: {
                 lastMessage: message._id,
+            },
+            params: {
+                id: message.group,
             }
         },
         null,

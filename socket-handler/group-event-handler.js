@@ -29,7 +29,7 @@ export default class GroupEventHandler {
                 });
                 if ( groups.length !== 0 ) {
                     for (const item of groups) {
-                        socket.join(item);
+                        socket.join(item._id);
                     } 
                 }
                 return callback(null, groups); 
