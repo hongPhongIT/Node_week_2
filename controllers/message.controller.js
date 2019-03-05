@@ -33,8 +33,14 @@ MessageController.getMessageByGroup = async (req, res, next = (e) => {
     return Promise.reject(e);
 }) => {
     const groupId = req.params.id;
+    const { page, limit } = req.query;
+    const skip = (parseInt(page) -1) * parseInt(limit);
     try {
-        const messages = await Message.find({ group: groupId, deletedAt: null }).lean(true);
+        const messages = await Message.find({ group: groupId, deletedAt: null })
+        .skip(skip)
+        .limit(parseInt(limit))
+        .sort({ createdAt: 1 })
+        .lean(true);
         if (!messages) {
             return ResponseHandler.returnSuccess(res, { message: 'Start conversation' });
         } else {

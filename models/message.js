@@ -22,7 +22,7 @@ const messageSchema = new Schema({
         type: Date,
         default: null,
     }
-}, { timeStamp: true });
+}, { timestamps: true });
 
 messageSchema.pre('save', async function (next) {
     try {

@@ -1,4 +1,6 @@
 let groupChattingId = '';
+let page = 0;
+let limit = 20;
 
 const socket = io('http://localhost:3000/?token=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1YzMyMjcyOGY1YWM5YzI3MjRkZDc4NTUiLCJkZWxldGVBdCI6Ik1vbiBKYW4gMDcgMjAxOSAwMTo1ODo0MCBHTVQrMDcwMCAoSW5kb2NoaW5hIFRpbWUpIiwiZnVsbE5hbWUiOnsiZmlyc3ROYW1lIjoiTmd1eWVuIiwibGFzdE5hbWUiOiJQYXNzd29yZCJ9LCJlbWFpbCI6ImhvbmdwaG9uZ0BnbWFpbC5jb20iLCJnZW5kZXIiOnRydWUsIl9fdiI6MCwiaWF0IjoxNTUwNzUyNzUwfQ.2Tq20MY0uKfTGmYdqpQsBjdoMRjPVXb3L-vvxs3J_Tk');
 function sendMessage() {
@@ -158,6 +160,15 @@ function messageSent(msg) {
   message.append(outGoing);
 }
 
+function scrollToBottom (id) {
+  const div = document.getElementById(id);
+  div.scrollTop = div.scrollHeight - div.clientHeight;
+}
+
+function loadMore() {
+
+}
+
 function getConversation() {
   const groupId = this.event.path[2].attributes.id.value;
   groupChattingId = groupId;
@@ -165,6 +176,7 @@ function getConversation() {
   if (user === null) {
     location.replace("http://localhost:3000/login");
   }
+
   $.ajax({
     type: "GET",
     dataType: "json",
@@ -172,7 +184,7 @@ function getConversation() {
       "accept": "application/json",
       "Access-Control-Allow-Origin":"*"
     },
-    url: 'http://localhost:3000/messages/'+ groupId +'/group',
+    url: 'http://localhost:3000/messages/'+ groupId +'/group?page='+ page +'&limit='+ limit,
     success: function (result) {
       if (result.isSuccess === true) {
         if (result.data.length !== 0) {
@@ -185,6 +197,7 @@ function getConversation() {
           })
         }
       }
+      scrollToBottom('chat_history');
     },
     // error: function (e) {
     // 		console.log(e);
